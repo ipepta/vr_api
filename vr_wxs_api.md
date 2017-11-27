@@ -12,8 +12,9 @@
   - [1.3提交购物车](#1_3)
   - [1.4查询购物车](#1_4)
   - [1.5查询点播单](#1_5)  
-  - [1.6获取支付参数(微信客户端支付时，需要向服务器获取加密参数)](#1_6)
-  - [1.7向点播单报告问题](#1_7)
+  - [1.6撤销点播单](#1_6)
+  - [1.7获取支付参数(微信客户端支付时，需要向服务器获取加密参数)](#1_7)
+  - [1.8向点播单报告问题](#1_8)
  2. [微信管理](#2)
   - [2.1查询微信用户](#2_1)
   - [2.2查询用户当前sceneid](#2_2)
@@ -149,7 +150,8 @@ openID|string|微信给用户对本公众号分配的唯一标识|是
 
 名称| 类型| 描述 |是否必须
 ----|-----|-----|-----
-openID|string|微信用户openid|是
+ticketID|string|点播单ID|否
+openID|string|微信用户openid|否
 status|string|点播单状态|否
 start|int|分页开始，默认为0|否
 limit|int|页面大小，默认为20|否
@@ -212,11 +214,34 @@ startTime|long|订单生效时间
 expireTime|int|订单失效时间间隔
 
 
-`点播单状态(status)枚举：PENDING_PAYMENT(待付款) / ALREADY_PAID(已付款) / OVER_TIME(超出观看时间)`
+`点播单状态(status)枚举：PENDING_PAYMENT(待付款) / ALREADY_PAID(已付款) / OVER_TIME(超出观看时间)/CANCELLED(完成付款前被用户撤销)`
 
 `点播单进度(progressPhase)枚举:PENDING_PAYMENT(待付款) / TO_DISTRIBUTE(待派发) / DISTRIBUTED(已派发) / PLAYING(已执行，播放中) / COMPLETED(播放完成) / TO_TERMINATE(待终止，即观众中途离开，并未点击观看完成) / TERMINATED(已终止，即管理员强行将播放终止)`
 
-<h3 id="1_6">1.6获取支付参数(微信客户端支付时，需要向服务器获取加密参数)</h3>
+<h3 id="1_6">1.6撤销点播单</h3>
+
+`撤销后, 点播单内的电影会回到购物车内, 可修改后再次提交. 而点播单本身不允许修改.`
+
+###request
+
+`DELETE /wxs/tickets?ticket_id={ticketID}`
+
+名称| 类型| 描述 |是否必须
+----|-----|-----|-----
+ticketID|string|点播单ID|是
+
+###response
+
+成功 200
+
+失败 400/500
+~~~
+{
+  "info": "失败描述"
+}
+~~~
+
+<h3 id="1_7">1.7获取支付参数(微信客户端支付时，需要向服务器获取加密参数)</h3>
 
 ###request
 
@@ -252,7 +277,7 @@ ticketID|string|提交支付的点播单ID|是
 支付流程见[微信支付开发文档](https://pay.weixin.qq.com/wiki/doc/api/jsapi.php?chapter=7_4)
 
 
-<h3 id="1_7">1.7向点播单报告问题</h3>
+<h3 id="1_8">1.8向点播单报告问题</h3>
 
 ###request
 
